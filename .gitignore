@@ -4,6 +4,8 @@ report.md
 .tutorignore
 .DS_Store
 .tutor/
+docs/research_report/
+docs/releases/
 # --- 以下为 §4 骨架落地时补的运行时/构建产物（data/seed 保留）---
 .env
 __pycache__/
