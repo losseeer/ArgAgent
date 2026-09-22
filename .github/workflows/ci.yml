@@ -1,0 +1,36 @@
+# §13.2 P1：L1 规则回归 + §6.11 契约静态断言（每次 PR）
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync
+      # 契约静态断言：state 字段与 §6.11 集合相等、§6.12 端点齐备、请求体拒收身份字段
+      - run: uv run pytest tests/unit
+      - run: uv run ruff check app tests
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm install --no-audit --no-fund
+      - run: npx tsc --noEmit

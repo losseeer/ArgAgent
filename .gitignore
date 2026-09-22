@@ -1,0 +1,22 @@
+gui-mockup.html
+project-design.md
+report.md
+.tutorignore
+.DS_Store
+.tutor/
+# --- 以下为 §4 骨架落地时补的运行时/构建产物（data/seed 保留）---
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.uv/
+.venv/
+data/*.db
+data/*.sqlite*
+data/chroma/*
+!data/chroma/.gitkeep
+node_modules/
+.next/
+next-env.d.ts
+tsconfig.tsbuildinfo
