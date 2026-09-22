@@ -1,4 +1,4 @@
 """骨架文件：只声明归属与契约指针，实现见 §13.2 对应期。
 
- - ONNX MiniLM-L6-v2 离线嵌入（ONNX Runtime 1.19，§5.2）；归属 P3。
+ - ONNX MiniLM-L6-v2 离线嵌入（ONNX Runtime 1.30，§5.2 实测）；归属 P3。
 """

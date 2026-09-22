@@ -4,10 +4,11 @@
 
 两条契约在这里就是可断言的（tests/unit/test_contracts.py）：
  1. 任何端点不接受客户端传来的 user_id（路径/查询/请求体），出现即 422（Q7 已决）。
- 2. PUT config 只接受 difficulty 与 strictness 两个键，其余键（含 persona / mode）422，不静默忽略（Q6 已决）。
+ 2. PUT config 只接受 difficulty 与 strictness 两个键，
+    其余键（含 persona / mode）422，不静默忽略（Q6 已决）。
 """
 
-from typing import Literal, Optional
+from typing import Literal
 
 from fastapi import APIRouter, Header, HTTPException, Query, Request
 from pydantic import BaseModel, ConfigDict
@@ -39,13 +40,13 @@ class SessionCreate(NoIdentityBody):
 
 
 class ConfigUpdate(NoIdentityBody):
-    difficulty: Optional[Literal["casual", "competitive", "brutal"]] = None
-    strictness: Optional[Literal["strict", "loose"]] = None
+    difficulty: Literal["casual", "competitive", "brutal"] | None = None
+    strictness: Literal["strict", "loose"] | None = None
 
 
 class RebutBody(NoIdentityBody):
     reason: str
-    qualifier: Optional[str] = None  # 非空 → retract_source='user_qualifier'（§6.11 T4）
+    qualifier: str | None = None  # 非空 → retract_source='user_qualifier'（§6.11 T4）
 
 
 def _not_implemented(name: str) -> "HTTPException":
