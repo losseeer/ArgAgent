@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* §8.1 视觉稿的唯一参照是 docs/gui-mockup.html；此处只放全局变量，组件样式随 P1 实现 */
+/* 全局设计变量：三层断言（事实 / 类比 / 逻辑）的主题色只在此定义一处；组件样式随各面板实现再补 */
 :root {
   --layer-fact: #2563eb;
   --layer-analogy: #7c3aed;

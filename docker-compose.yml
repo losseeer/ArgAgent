@@ -1,5 +1,5 @@
-# 一键起 backend + frontend + chroma（§4 / §9.1）。
-# 所有 key 都可空：空 .env 也必须能起来（§13.2 P1 验收）。
+# 一键起 backend + frontend + chroma。
+# 所有 key 都可空：空 .env 也必须能起来。
 services:
   backend:
     build: ./backend
@@ -12,7 +12,7 @@ services:
     volumes:
       - ./data:/srv/data
     extra_hosts:
-      # 让容器内的 Ollama 回退链能打到宿主机（§6.5 tier1）
+      # 让容器内的 Ollama 回退链（主模型 → 本地 Ollama → 兜底模板的第二级）能打到宿主机
       - "host.docker.internal:host-gateway"
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8010/api/healthz', timeout=3).status == 200 else 1)"]
@@ -34,7 +34,7 @@ services:
         condition: service_healthy
 
   chroma:
-    # tag 未能在本网络核实（auth.docker.io 不可达）；拉不到只改这一行（§5.2 唯一未验项）
+    # 该镜像 tag 未能在本网络核实（auth.docker.io 不可达）；拉不到时只改这一行
     image: chromadb/chroma:1.5.9
     ports:
       - "${CHROMA_PORT:-8011}:8000"

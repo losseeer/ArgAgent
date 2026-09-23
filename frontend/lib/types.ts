@@ -1,5 +1,5 @@
-// 骨架：类型由 backend OpenAPI 生成（docs/openapi.json → 本文件），勿手改契约字段。
-// §6.11 的 DebateConfig / DebateState 字段与 §6.12 事件 payload 是生成源。
+// 骨架：类型口径来自后端契约——backend/app/graph/state.py 的 DebateConfig / DebateState 字段，
+// 以及后端 SSE 事件的 payload；勿手改契约字段。
 
 export type LayerTag = "FACT" | "ANALOGY" | "LOGIC";
 

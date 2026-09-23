@@ -10,8 +10,8 @@ import TopicPicker from "../components/TopicPicker";
 import UsagePanel from "../components/UsagePanel";
 
 /**
- * 骨架页：只把 §8.2 的组件摆到 §8.1 视觉稿的位置，全部子组件当前返回 null。
- * 归属 P1（DebateStream 有真实流式渲染）→ P2（LedgerPanel）→ P3（FactCheckPanel）→ P4（FallacyPanel）。
+ * 首页布局：只按顶栏 / 主区 / 右侧栏三个槽位摆放组件，全部子组件当前返回 null。
+ * 落地顺序：DebateStream（真实流式渲染）→ LedgerPanel（台账）→ FactCheckPanel（证据）→ FallacyPanel（谬误）。
  */
 export default function Page() {
   return (

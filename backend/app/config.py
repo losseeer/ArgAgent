@@ -1,7 +1,7 @@
-"""§9.3 `.env.example` 的唯一读取端（pydantic-settings）。
+"""`.env.example` 的唯一读取端（pydantic-settings）。
 
-硬约束：所有 key 都可空——空 key 必须仍能走完一轮对话（§6.5 降级到兜底模板）。
-端口与模型名默认值即 §5.2 版本基线，不在别处重复写死。
+硬约束：所有 key 都可空——空 key 必须仍能走完一轮对话（降级到本地兜底模板）。
+端口与模型名的默认值即仓库锁定的版本基线，不在别处重复写死。
 """
 
 from functools import lru_cache
@@ -24,7 +24,7 @@ class Settings(BaseSettings):
     # Web 检索（不填则降级 DuckDuckGo）
     tavily_api_key: str = ""
 
-    # 内容审核二次判（不填则只走本地模式表并显式标"审核降级"，§6.13 / N8）
+    # 内容审核二次判（不填则只走本地模式表并显式标"审核降级"，降级必须可见、不许静默）
     moderation_api_key: str = ""
 
     # 端口
@@ -38,7 +38,10 @@ class Settings(BaseSettings):
 
     @property
     def moderation_mode(self) -> str:
-        """SSE `safety.status{mode}` 与 BadgeBar 角标的唯一数据源（§6.13）。"""
+        """SSE `safety.status{mode}` 与前端角标的唯一数据源。
+
+        配了 key 就必须报 `heuristic+remote`，报反了算缺陷。
+        """
         return "heuristic+remote" if self.moderation_api_key else "heuristic_only"
 
 

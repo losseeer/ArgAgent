@@ -1,7 +1,7 @@
 # 架构与数据流
 
 > 本文件是公开仓库的结构性说明；阈值与验收判据不在此重复（结果总表见 `docs/eval-report.md`，计算口径见 `backend/app/eval/metrics.py`）。
-> 下方代码块是数据流的唯一真源；`docs/architecture.svg` 由它导出，导出脚本待 P1 随 CI 落地。
+> 下方代码块是数据流的唯一真源；`architecture.svg` 由它导出，导出脚本尚未落地。
 
 ## 主图（workflow 模式）
 
@@ -9,13 +9,13 @@
 用户消息
   → classify            意图分类 + 三层断言 + 谓词抽取（同一次结构化调用）
   → safety_filter       输入侧 gate（本地模式表 + 可选远端二次判）
-  → consistency         与用户本会话早前断言比对（T1）
+  → consistency         与用户本会话早前断言比对
   → retrieve?           按五类判据（数值 / 时间 / 人名 / 机构 / 因果）触发，≤2 步
   → attack              短轮次关键攻击 + 本轮自身断言谓词
   → fallacy             谬误标注，confidence 三档
-  → self_check          agent 侧矛盾（T2）+ OUTPUT 前轻校验；含 safety 输出侧
+  → self_check          agent 侧矛盾 + OUTPUT 前轻校验；含 safety 输出侧
       ↺ attack          校验不过则重试，上限 2 次；仍不过走兜底模板并把缺失项原样推给前端
-  → OUTPUT              校验通过后才写 agent claim 入台账（T3）
+  → OUTPUT              校验通过后才写 agent claim 入台账
 ```
 
 `agent-loop` 模式（LLM 直接持工具）是**默认关闭**的第二条装配路径，其输出不受上述出口校验覆盖，界面须显式标注"无护栏"。
@@ -34,7 +34,7 @@
 | `backend/app/memory/` | 三张台账（claims / contradictions / patterns） | 矛盾判定统一走 `memory/predicate_match.py` |
 | `backend/app/rag/` | 检索分层（web / 学术 / 百科 / 向量 / 词表） | 词表层不进 Chroma，是内存精确匹配 |
 | `backend/app/llm/` | 三级降级链（主模型 → 本地 Ollama → 兜底模板） | 模型名只从 `.env` 的 `DEEPSEEK_MODEL` 读 |
-| `backend/app/eval/` | 五族指标 N/K/V/R/O | 阈值只写在内部规格里，本文件与代码注释都不复制数字 |
+| `backend/app/eval/` | 五族指标（结构断言 / 构造式真值剧本 / 小金标 / 鲁棒性 / 时延） | 阈值只写在评测报告口径里，本文件与代码注释都不复制数字 |
 | `frontend/components/` | 一组件一职责 | 角标只允许 `BadgeBar.tsx` 一个挂载点 |
 
 ## 契约即测试

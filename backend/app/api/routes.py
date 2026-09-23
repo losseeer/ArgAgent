@@ -1,11 +1,13 @@
-"""§6.12 的 14 个端点骨架：路径 / 方法 / 请求契约已按表落齐，处理逻辑随 §13.2 P1 起逐期填。
+"""骨架占位文件：只声明职责与契约，尚无实现。
+
+14 个契约端点的路径 / 方法 / 请求契约已落齐，处理逻辑尚未实现、后续分批补齐。
 
 统一响应包（SSE 除外）：{"ok": true, "data": {...}, "error": null, "trace_id": "..."}。
 
-两条契约在这里就是可断言的（tests/unit/test_contracts.py）：
- 1. 任何端点不接受客户端传来的 user_id（路径/查询/请求体），出现即 422（Q7 已决）。
+两条契约在这里就是可断言的（backend/tests/unit/test_contracts.py）：
+ 1. 任何端点不接受客户端传来的 user_id（路径/查询/请求体），出现即 422。
  2. PUT config 只接受 difficulty 与 strictness 两个键，
-    其余键（含 persona / mode）422，不静默忽略（Q6 已决）。
+    其余键（含 persona / mode）422，不静默忽略。
 """
 
 from typing import Literal
@@ -19,7 +21,7 @@ _FORBIDDEN_IDENTITY = {"user_id", "userId", "uid"}
 
 
 def deny_identity_params(request: Request) -> None:
-    """查询参数里出现任何身份字段即 422（身份只从 cookie 解析，§6.12 鉴权第 1 条）。"""
+    """查询参数里出现任何身份字段即 422：身份只从服务端解析出的 cookie 来，不由调用方声明。"""
     bad = _FORBIDDEN_IDENTITY.intersection(request.query_params.keys())
     if bad:
         raise HTTPException(status_code=422, detail=f"identity params not accepted: {sorted(bad)}")
@@ -46,18 +48,19 @@ class ConfigUpdate(NoIdentityBody):
 
 class RebutBody(NoIdentityBody):
     reason: str
-    qualifier: str | None = None  # 非空 → retract_source='user_qualifier'（§6.11 T4）
+    qualifier: str | None = None  # 非空即用户补了限定前提 → retract_source='user_qualifier'
 
 
 def _not_implemented(name: str) -> "HTTPException":
-    return HTTPException(status_code=501, detail=f"skeleton: {name} 待 §13.2 对应期实现")
+    return HTTPException(status_code=501, detail=f"骨架占位：{name} 尚未实现")
 
 
 @router.get("/healthz")
 async def healthz(request: Request):
     """就绪探针（compose 等它）。
 
-    只报告**配置层面**的可用性与当前降级层级；真正的连通性探测随 §13.2 P1 的 llm/factory 落地。
+    只报告**配置层面**的可用性与当前降级层级；
+    真正的模型连通性探测尚未实现，要等 llm/factory 的降级链落地。
     """
     deny_identity_params(request)
     from ..config import get_settings
@@ -100,7 +103,7 @@ async def create_turn(
 
 @router.post("/turns/{tid}/abort")
 async def abort_turn(tid: str, request: Request):
-    """中止在 OUTPUT 之前 → 该轮 agent claim 不入台账；不得用 retracted=1 表达中止（§6.12）。"""
+    """中止在 OUTPUT 之前 → 该轮 agent claim 不入台账；不得用 retracted=1 表达中止。"""
     deny_identity_params(request)
     raise _not_implemented("POST /turns/{tid}/abort")
 
@@ -113,7 +116,7 @@ async def rebut(
     body: RebutBody,
     request: Request,
 ):
-    """用户回驳谬误标注或矛盾卡：用户侧唯一的撤回写入口，重复提交幂等（Q14 已决）。"""
+    """用户回驳谬误标注或矛盾卡：用户侧唯一的撤回写入口，同一张卡重复提交幂等。"""
     deny_identity_params(request)
     raise _not_implemented("POST /turns/{tid}/{target}/{i}/rebut")
 
@@ -150,7 +153,7 @@ async def export_patterns(request: Request):
 
 @router.post("/memory/patterns/confirmation")
 async def request_confirmation(request: Request):
-    """一次性确认 token：TTL 5 分钟、单次消费（§6.12 鉴权第 2 条）。"""
+    """一次性确认 token：TTL 5 分钟、单次消费，清空跨会话记忆前必须先拿到它。"""
     deny_identity_params(request)
     raise _not_implemented("POST /memory/patterns/confirmation")
 

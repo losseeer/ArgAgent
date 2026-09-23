@@ -6,7 +6,7 @@ report.md
 .tutor/
 docs/research_report/
 docs/releases/
-# --- 以下为 §4 骨架落地时补的运行时/构建产物（data/seed 保留）---
+# --- 以下为骨架落地时补的运行时/构建产物（data/seed 保留）---
 .env
 __pycache__/
 *.py[cod]

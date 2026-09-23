@@ -1,4 +1,5 @@
-"""骨架文件：只声明归属与契约指针，实现见 §13.2 对应期。
+"""骨架占位文件：只声明职责与契约，尚无实现。
 
- - 同 system_coach.py：仅 self-play（P6），非在线路径。
+ - 同 backend/app/prompts/system_coach.py：仅供 self-play 语料生成（默认关闭的可选增强），
+   不在在线对话路径上。
 """

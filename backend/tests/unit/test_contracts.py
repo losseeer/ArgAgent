@@ -1,6 +1,7 @@
-"""§6.11 契约静态断言（§13.2 P1 验收项：CI 跑 state 字段与节点输出无缺失）。
+"""契约静态断言：state 字段与节点输出无缺失（每次 PR 的 CI 必跑项）。
 
-用集合相等而不是"包含"：多一个字段同样要红——§6.11 的硬约束是"state 里的字段必须有明确写入节点"。
+用集合相等而不是"包含"：多一个字段同样要红——硬约束是"state 里的字段必须有明确写入节点"。
+契约真源是 backend/app/graph/state.py 的键集合与本文件的期望集合，两者必须同步改。
 """
 
 import pathlib
@@ -12,7 +13,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
 
 from app.graph.state import DebateConfig, DebateState  # noqa: E402
 
-# —— §6.11 字段的唯一真源：改动必须同步设计文档，否则本文件即红 ——
+# —— 契约字段的唯一真源：改字段必须同步 app/graph/state.py，否则本文件即红 ——
 CONFIG_KEYS = {
     "persona",
     "difficulty",
@@ -53,7 +54,7 @@ STATE_KEYS = {
     "pending_events",
 }
 
-# §6.12 的 14 个端点（方法 + 路径）
+# 契约冻结的 14 个端点（方法 + 路径）
 ROUTES = {
     ("GET", "/api/healthz"),
     ("POST", "/api/sessions"),
@@ -72,16 +73,16 @@ ROUTES = {
 }
 
 
-def test_debate_config_keys_match_design_6_11():
+def test_debate_config_keys_match_contract():
     assert set(DebateConfig.__annotations__) == CONFIG_KEYS
 
 
-def test_debate_state_keys_match_design_6_11():
+def test_debate_state_keys_match_contract():
     assert set(DebateState.__annotations__) == STATE_KEYS
 
 
 def test_safety_and_validation_slots_exist():
-    """第十八轮补的两个槽位：N8 与 §6.2 出口校验都挂它们。"""
+    """safety / validation 两个槽位：降级角标与出口校验的结果都挂在它们上面。"""
     assert {"safety", "validation"} <= STATE_KEYS
 
 
@@ -99,7 +100,7 @@ def test_routes_expose_all_contracted_endpoints():
         for method in ops
     }
     missing = ROUTES - exposed
-    assert not missing, f"§6.12 端点未装配: {missing}"
+    assert not missing, f"契约端点未装配: {missing}"
 
 
 def test_request_bodies_reject_identity_and_immutable_keys():

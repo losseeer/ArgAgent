@@ -1,4 +1,4 @@
-# §9.2 的六条命令，一条不多（加目标即扩范围）。
+# 上手只需这六条命令，一条不多（加目标即扩范围）。
 
 .PHONY: up down dev logs eval reset-db
 
@@ -19,7 +19,7 @@ dev: ## 本地模式（无 docker，依赖 host python/node）
 logs: ## 跟踪日志
 	docker compose logs -f
 
-eval: ## 跑 §10.2 五族指标（N/K/V/R/O），输出 docs/eval-report.md
+eval: ## 跑结构、一致性、gold 集质量、鲁棒、时延五族指标，输出 docs/eval-report.md
 	cd backend && python -m app.eval.runner
 
 reset-db: ## 清空 SQLite + Chroma（保留 data/seed）

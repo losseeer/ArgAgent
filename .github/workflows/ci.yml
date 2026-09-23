@@ -1,4 +1,4 @@
-# §13.2 P1：L1 规则回归 + §6.11 契约静态断言（每次 PR）
+# CI：契约与台账回归（规则回归 + 状态字段/端点契约静态断言），每次 PR 跑
 name: ci
 
 on:
@@ -18,7 +18,7 @@ jobs:
         with:
           python-version: "3.12"
       - run: uv sync
-      # 契约静态断言：state 字段与 §6.11 集合相等、§6.12 端点齐备、请求体拒收身份字段
+      # 契约静态断言：DebateState/DebateConfig 字段与契约集合相等、14 个契约端点齐备、请求体拒收身份字段
       - run: uv run pytest tests/unit
       - run: uv run ruff check app tests
 

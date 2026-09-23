@@ -41,7 +41,7 @@ make dev
 
 ## 目录与上手代码
 
-- 架构与数据流：`ARCHITECTURE.md`
+- 架构与数据流：`docs/ARCHITECTURE.md`
 - 后端：`backend/app/`（`graph/` 状态机、`memory/` 三张台账、`rag/` 检索分层、`eval/` 五族指标）
 - 前端：`frontend/`（`components/` 一组件一文件）
 

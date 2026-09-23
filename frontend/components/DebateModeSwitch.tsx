@@ -1,7 +1,8 @@
 /**
- * workflow / agent-loop，**只能新会话定**（Q6 已决：中途切等于当场放弃出口校验）。
+ * 骨架占位文件：只声明职责与契约，尚无实现。
+ * 论辩模式二选一：workflow / agent-loop，**只能新会话定**——中途切换等于当场放弃出口校验。
  */
 export default function DebateModeSwitch() {
-  // 骨架：契约见 §8.2，实现随 §13.2 对应期
+  // 骨架占位：尚无实现
   return null;
 }

@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "结构化论辩练习：断言台账 + 矛盾检测 + 透明谬误标注",
 };
 
-// §8.2：TopBar 右侧的 BadgeBar 是五类降级/提示角标的唯一挂载点（N8 断言其存在）
+// 顶栏右侧的 BadgeBar 是五类降级/提示角标的唯一挂载点；降级必须可见，缺角标即视为缺陷
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="zh-CN">
