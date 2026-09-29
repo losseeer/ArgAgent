@@ -39,7 +39,7 @@ class DebateState(TypedDict):
     stance: Literal["pro", "con"]
     config: DebateConfig
 
-    # —— 轮内产物（节点写入）——
+    # —— 回合内产物（节点写入）——
     messages: list[dict[str, str]]      # [{role, content, ts, msg_id, layer?, fallacy?}]
     user_claim_ids: list[int]
     fact_claims: list[dict]

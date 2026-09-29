@@ -59,8 +59,10 @@ def _not_implemented(name: str) -> "HTTPException":
 async def healthz(request: Request):
     """就绪探针（compose 等它）。
 
-    只报告**配置层面**的可用性与当前降级层级；
-    真正的模型连通性探测尚未实现，要等 llm/factory 的降级链落地。
+    只报告**配置层面**的事实：主模型有没有 key、备模型的模型名与地址、当前审核档位。
+    备模型不给"是否可用"的结论——它有默认地址，地址在并不代表连得上。
+    这里刻意不打模型：探针每被拉一次就多一次外呼，会把 compose 的探活变成对上游的轰炸。
+    实际可用层级由降级链在回合内确认（backend/app/llm/factory.py），并经 SSE 角标可见。
     """
     deny_identity_params(request)
     from ..config import get_settings
@@ -70,7 +72,7 @@ async def healthz(request: Request):
         "ok": True,
         "data": {
             "primary": {"model": s.deepseek_model, "configured": s.primary_configured},
-            "backup": {"model": s.ollama_model, "configured": bool(s.ollama_host)},
+            "backup": {"model": s.ollama_model, "host": s.ollama_host},
             "safety_mode": s.moderation_mode,
         },
         "error": None,
@@ -96,14 +98,14 @@ async def create_turn(
     request: Request,
     idempotency_key: str = Header(..., alias="Idempotency-Key"),
 ):
-    """发一轮，返回 SSE 流；Idempotency-Key 必填（防重试双写 ledger）。"""
+    """发一个回合，返回 SSE 流；Idempotency-Key 必填（防重试双写 ledger）。"""
     deny_identity_params(request)
     raise _not_implemented("POST /sessions/{sid}/turns (SSE)")
 
 
 @router.post("/turns/{tid}/abort")
 async def abort_turn(tid: str, request: Request):
-    """中止在 OUTPUT 之前 → 该轮 agent claim 不入台账；不得用 retracted=1 表达中止。"""
+    """中止在 OUTPUT 之前 → 本回合 agent claim 不入台账；不得用 retracted=1 表达中止。"""
     deny_identity_params(request)
     raise _not_implemented("POST /turns/{tid}/abort")
 

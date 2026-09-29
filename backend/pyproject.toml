@@ -35,6 +35,8 @@ build-backend = "hatchling.build"
 packages = ["app"]
 
 [tool.pytest.ini_options]
+# 降级链与后续图测试都是协程测试：省掉逐个标 asyncio 的样板
+asyncio_mode = "auto"
 pythonpath = ["."]
 testpaths = ["tests"]
 addopts = "-q"
