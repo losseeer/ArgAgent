@@ -34,7 +34,7 @@ services:
         condition: service_healthy
 
   chroma:
-    # 该镜像 tag 未能在本网络核实（auth.docker.io 不可达）；拉不到时只改这一行
+    # 该 tag 已实测可拉（docker pull 成功，digest sha256:1e0b73a1…）；拉不到时只改这一行
     image: chromadb/chroma:1.5.9
     ports:
       - "${CHROMA_PORT:-8011}:8000"

@@ -36,12 +36,15 @@ class FakeChain:
 
     async def stream(self, *, system, user, temperature=0.2, max_tokens=512,
                      json_mode=False, template=""):
+        """与真链同口径：降层事件排在第一个字之前，否则假链验不出"角标不晚于正文"。"""
         self.calls["stream"] += 1
         index = self.calls["stream"] - 1
         text = self.drafts[index] if index < len(self.drafts) else TEMPLATE_REPLY
         tier = self.tiers[index] if index < len(self.tiers) else 0
         if tier:
             self._events.append({"event": "llm.fallback", "data": {"tier": tier, "reason": "x"}})
+        for event in self.drain_events():
+            yield ("fallback", event)
         yield ("delta", text)
         usage = {"prompt": 2, "completion": 3}
         yield ("done", _Completion(text=text, tier=tier, reason="", usage=usage))
@@ -106,6 +109,9 @@ async def test_retry_happens_exactly_twice_then_falls_back():
     names = [e["event"] for e in final["pending_events"]]
     assert names.count("validation.failed") == 2, "重试时一次、终态一次，前端不静默"
     assert names[-1] == "turn.done"
+    # 终稿经队列发给前端，不走流式：模型那两稿都被判作废了，模板这一稿从没在流里吐过字
+    queued = [e for e in final["pending_events"] if e["event"] == "message.delta"]
+    assert queued == [{"event": "message.delta", "data": {"text": TEMPLATE_REPLY, "attempt": 2}}]
 
 
 async def test_first_draft_passing_skips_retry_and_carries_layer():

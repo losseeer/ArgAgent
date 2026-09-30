@@ -116,3 +116,31 @@ def test_request_bodies_reject_identity_and_immutable_keys():
     with pytest.raises(ValidationError):
         ConfigUpdate.model_validate({"mode": "agent-loop"})
     assert ConfigUpdate.model_validate({"strictness": "loose"}).strictness == "loose"
+
+
+def test_every_request_body_model_forbids_identity():
+    """按模型类扫，不点名：点名那条只覆盖写它时已存在的请求体，后来加的会静默漏在断言之外。
+
+    报错类型必须是 `extra_forbidden`：光看 ValidationError 会被"缺必填字段"顶包，
+    一个忘了写 extra='forbid' 的新模型照样绿。
+    """
+    pytest.importorskip("pydantic")
+    import inspect
+
+    from pydantic import BaseModel, ValidationError
+
+    from app.api import routes
+
+    models = [
+        obj
+        for obj in vars(routes).values()
+        if inspect.isclass(obj)
+        and issubclass(obj, BaseModel)
+        and obj.__module__ == routes.__name__
+    ]
+    assert len(models) >= 4, "扫描本身没找到请求体模型，这条断言就是空的"
+
+    for model in models:
+        with pytest.raises(ValidationError) as caught:
+            model.model_validate({"user_id": "someone"})
+        assert "extra_forbidden" in [err["type"] for err in caught.value.errors()], model.__name__

@@ -40,17 +40,22 @@ async def fallback_node(state: Mapping[str, Any]) -> dict[str, Any]:
     这段文字是模板不是模型输出，所以不打层标签——补一个 [LOGIC] 之类就等于把
     "我们没答上来"伪装成"我们打的是逻辑层"。它也不进 agent 台账：台账只收过校验的版本。
     这里发的是 `validation.failed`（校验没过），不是 `llm.fallback`（模型降层），两者不混用。
+
+    模板正文走 `message.delta` 排在 failed 之后，而不是经流式写入：这一稿从没在流里吐过字
+    （前面积攒的草稿已被判作废），而前端的口径是"见 failed 清缓冲、之后的 delta 就是终稿"，
+    顺序由 pending_events 的追加顺序保证，所以这两条都发在队列里。
     """
     validation = state["validation"]
+    attempt = validation.get("attempt", 0)
     events = list(state["pending_events"])
     events.append(
         {
             "event": "validation.failed",
-            "data": {
-                "missing": list(validation.get("missing") or []),
-                "attempt": validation.get("attempt", 0),
-            },
+            "data": {"missing": list(validation.get("missing") or []), "attempt": attempt},
         }
+    )
+    events.append(
+        {"event": "message.delta", "data": {"text": TEMPLATE_REPLY, "attempt": attempt}}
     )
     return {"attack_draft": TEMPLATE_REPLY, "attack_layer": None, "pending_events": events}
 
@@ -125,8 +130,9 @@ _compiled: Any = None
 def get_workflow():
     """进程内单例：图本身无状态，状态一律由 initial_state 传进去。
 
-    注意这里只有 workflow 模式的图：`config.mode` 为 agent-loop 时会静默跑成这张图，
-    所以按 mode 选 builder 的那道分流必须在端点落进图之前补上。
+    这里只有 workflow 模式的图。`config.mode` 为 agent-loop 时会静默跑成这张图，
+    所以那道分流已经挪到建会话的一格当场拒掉（见 backend/app/api/routes.py 的 create_session），
+    能走到这里的 mode 恒为 workflow。agent-loop 的图真装配起来时，分流该回到这里按 mode 选 builder。
     """
     global _compiled
     if _compiled is None:
